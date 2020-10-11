@@ -3,4 +3,4 @@
 - [线性回归模型](https://kolibreath.github.io/learning-pytorch/线性回归模型.html)
 - [线性回归模型的简洁实现](https://kolibreath.github.io/learning-pytorch/线性回归模型的简洁实现.html)
 - [Softmax模型](https://kolibreath.github.io/learning-pytorch/Softmax模型.html)
-- [Softmax模型的简洁实现](https://kolibreath.github.io/learning-pytorch/Softmax模型的简洁实现.html)
+- [Softmax模型的简洁实现](https://kolibreath.github.io/learning-pytorch/Softmax的简洁实现.html)
