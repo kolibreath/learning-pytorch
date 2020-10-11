@@ -1,6 +1,7 @@
 # 《动手学习深度学习》PyTorch版笔记
 
 ## 文章内容
+- [d2lzh_pytorch.ipynb](https://kolibreath.github.io/learning-pytorch/d2lzh_pytorch.html)
 - [线性回归模型](https://kolibreath.github.io/learning-pytorch/线性回归模型.html)
 - [线性回归模型的简洁实现](https://kolibreath.github.io/learning-pytorch/线性回归模型的简洁实现.html)
 - [Softmax模型](https://kolibreath.github.io/learning-pytorch/softmax模型.html)
