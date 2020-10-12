@@ -6,6 +6,9 @@
 - [线性回归模型的简洁实现](https://kolibreath.github.io/learning-pytorch/线性回归模型的简洁实现.html)
 - [Softmax模型](https://kolibreath.github.io/learning-pytorch/softmax模型.html)
 - [Softmax模型的简洁实现](https://kolibreath.github.io/learning-pytorch/Softmax的简洁实现.html)
+- [多层感知机的从零开始实现](https://kolibreath.github.io/learning-pytorch/多层感知机的从零开始实现.html)
+- [多层感知机的从零开始实现](https://kolibreath.github.io/learning-pytorch/多层感知机的简洁实现.html)
+- [多项式函数的拟合实验](https://kolibreath.github.io/learning-pytorch/多项式函数的拟合实验.html)
 
 ## 说明和错误报告
 
