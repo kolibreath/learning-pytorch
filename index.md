@@ -12,6 +12,15 @@
 
 ## 说明和错误报告
 
+### 3.2.4 定义模型
+```
+def linreg(X, w, b):
+#     X = torch.tensor(X, dtype=torch.float32)
+    X = X.clone().detach().float()
+    return torch.mm(X, w) + b
+```
+需要改成这样的代码 貌似是X的类型有问题
+
 ### d2lzh_pytorch
 这个库大家可以使用文章中链接的jupyter notebook代码生成。
 1. 首先将代码复制到本地的jupyter notebook

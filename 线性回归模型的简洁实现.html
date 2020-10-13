@@ -13076,7 +13076,7 @@ div#notebook {
 
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[5]:</div>
+<div class="prompt input_prompt">In&nbsp;[3]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
@@ -13101,12 +13101,62 @@ div#notebook {
 <span class="n">labels</span> <span class="o">=</span> <span class="n">true_w</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">features</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">true_w</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">features</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> 
 <span class="n">labels</span> <span class="o">+=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="n">labels</span><span class="o">.</span><span class="n">size</span><span class="p">()))</span>
 
+<span class="c1"># 组合（wrapping）成Dataset</span>
+<span class="c1"># reference: https://pytorch.org/docs/stable/_modules/torch/utils/data/dataset.html#TensorDataset</span>
 <span class="n">dataset</span> <span class="o">=</span> <span class="n">Data</span><span class="o">.</span><span class="n">TensorDataset</span><span class="p">(</span><span class="n">features</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
 
 <span class="n">data_iter</span> <span class="o">=</span> <span class="n">Data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
 
 
 <span class="nb">print</span><span class="p">(</span><span class="n">features</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">labels</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+<span class="c1">## 输出nn.Module 的文档</span>
+<span class="c1"># print(nn.Module.__doc__)</span>
+
+<span class="c1">## Module 可以表示神经网络中的某一个层 也可以表示包含了很多层的神经网络</span>
+<span class="c1">## 使用nn.module构建一个线性回归模型</span>
+<span class="k">class</span> <span class="nc">LinearNet</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_feature</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">LinearNet</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">linear</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">n_feature</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">linear</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">y</span>
+  
+<span class="c1"># 使用Sequential 有序容器 依次将网络层添加到计算图中</span>
+<span class="c1"># Linear默认情况下有三个参数 这里制定输入个数为num_inputs, 只有一个输出 1 ，bias 需要学习，默认值为True</span>
+<span class="c1"># reference: https://pytorch.org/docs/stable/generated/torch.nn.Linear.html?highlight=nn%20linear#torch.nn.Linear</span>
+<span class="n">net</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">num_inputs</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+<span class="kn">from</span> <span class="nn">torch.nn</span> <span class="kn">import</span> <span class="n">init</span>
+
+<span class="c1"># 初始化net中的weight 和 bias</span>
+<span class="n">init</span><span class="o">.</span><span class="n">normal_</span><span class="p">(</span><span class="n">net</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">weight</span><span class="p">,</span> <span class="n">mean</span> <span class="o">=</span> <span class="mi">0</span> <span class="p">,</span> <span class="n">std</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">)</span>
+<span class="n">init</span><span class="o">.</span><span class="n">constant_</span><span class="p">(</span><span class="n">net</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">bias</span><span class="p">,</span> <span class="n">val</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+
+<span class="c1">## 使用nn模块定义的损失函数</span>
+<span class="n">loss</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">MSELoss</span><span class="p">()</span>
+
+<span class="c1">## 定义优化算法</span>
+<span class="kn">import</span> <span class="nn">torch.optim</span> <span class="k">as</span> <span class="nn">optim</span>
+
+<span class="c1">## 无需自己实现小批量随机梯度下降算法</span>
+<span class="n">optimizer</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">SGD</span><span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span> <span class="o">=</span> <span class="mf">0.03</span><span class="p">)</span>
+
+<span class="n">nums_epochs</span> <span class="o">=</span> <span class="mi">30</span>
+<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">nums_epochs</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">data_iter</span><span class="p">:</span>
+        <span class="n">X</span><span class="o">=</span><span class="n">X</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">net</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="n">loss</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">y</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+        
+        <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span> <span class="c1"># 梯度清零，等价于net.zero_grad()</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+        <span class="c1"># 进行一次参数更新</span>
+        <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;epoch </span><span class="si">%d</span><span class="s2">, loss: </span><span class="si">%f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">epoch</span><span class="p">,</span> <span class="n">l</span><span class="o">.</span><span class="n">item</span><span class="p">()))</span>
     
 </pre></div>
 
@@ -13124,7 +13174,37 @@ div#notebook {
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>tensor([ 0.4036, -0.2155], dtype=torch.float64) tensor(1.5275, dtype=torch.float64)
+<pre>tensor([-0.0103,  0.8713], dtype=torch.float64) tensor(-2.9835, dtype=torch.float64)
+epoch 1, loss: 0.000217
+epoch 2, loss: 0.000125
+epoch 3, loss: 0.000097
+epoch 4, loss: 0.000036
+epoch 5, loss: 0.000139
+epoch 6, loss: 0.000111
+epoch 7, loss: 0.000084
+epoch 8, loss: 0.000146
+epoch 9, loss: 0.000127
+epoch 10, loss: 0.000125
+epoch 11, loss: 0.000286
+epoch 12, loss: 0.000109
+epoch 13, loss: 0.000038
+epoch 14, loss: 0.000084
+epoch 15, loss: 0.000058
+epoch 16, loss: 0.000172
+epoch 17, loss: 0.000064
+epoch 18, loss: 0.000082
+epoch 19, loss: 0.000126
+epoch 20, loss: 0.000076
+epoch 21, loss: 0.000083
+epoch 22, loss: 0.000145
+epoch 23, loss: 0.000093
+epoch 24, loss: 0.000098
+epoch 25, loss: 0.000079
+epoch 26, loss: 0.000074
+epoch 27, loss: 0.000126
+epoch 28, loss: 0.000100
+epoch 29, loss: 0.000082
+epoch 30, loss: 0.000051
 </pre>
 </div>
 </div>
@@ -13135,61 +13215,10 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[10]:</div>
+<div class="prompt input_prompt">In&nbsp;[1]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">## 输出nn.Module 的文档</span>
-<span class="c1"># print(nn.Module.__doc__)</span>
-
-<span class="c1">## Module 可以表示神经网络中的某一个层 也可以表示包含了很多层的神经网络</span>
-<span class="c1">## 使用nn.module构建一个线性回归模型</span>
-<span class="k">class</span> <span class="nc">LinearNet</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_feature</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">LinearNet</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">linear</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">n_feature</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-        
-    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">linear</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">y</span>
-  
-<span class="c1"># 初始化网络实例</span>
-<span class="c1"># net = LinearNet(num_inputs)</span>
-<span class="c1"># print(net)</span>
-
-
-<span class="c1">## 使用Sequential 有序容器 依次将网络层添加到计算图中</span>
-<span class="n">net</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">num_inputs</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
-<span class="c1"># print(net)</span>
-
-<span class="c1">## 查看该模型所有的可学习的参数</span>
-<span class="c1"># for param in net.parameters():</span>
-<span class="c1">#     print(param)</span>
-
-<span class="kn">from</span> <span class="nn">torch.nn</span> <span class="kn">import</span> <span class="n">init</span>
-
-<span class="n">init</span><span class="o">.</span><span class="n">normal_</span><span class="p">(</span><span class="n">net</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">weight</span><span class="p">,</span> <span class="n">mean</span> <span class="o">=</span> <span class="mi">0</span> <span class="p">,</span> <span class="n">std</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">)</span>
-<span class="n">init</span><span class="o">.</span><span class="n">constant_</span><span class="p">(</span><span class="n">net</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">bias</span><span class="p">,</span> <span class="n">val</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
-
-<span class="c1">## 使用nn模块定义的损失函数</span>
-<span class="n">loss</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">MSELoss</span><span class="p">()</span>
-
-<span class="c1">## 定义优化算法</span>
-<span class="kn">import</span> <span class="nn">torch.optim</span> <span class="k">as</span> <span class="nn">optim</span>
-
-<span class="c1">## 无需自己实现小批量随你梯度下降算法</span>
-<span class="n">optimizer</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">SGD</span><span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span> <span class="o">=</span> <span class="mf">0.03</span><span class="p">)</span>
-
-<span class="n">nums_epochs</span> <span class="o">=</span> <span class="mi">30</span>
-<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">nums_epochs</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
-    <span class="k">for</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">data_iter</span><span class="p">:</span>
-        <span class="n">X</span><span class="o">=</span><span class="n">X</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
-        <span class="n">output</span> <span class="o">=</span> <span class="n">net</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
-        <span class="n">l</span> <span class="o">=</span> <span class="n">loss</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">y</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
-        <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span> <span class="c1"># 梯度清零，等价于net.zero_grad()</span>
-        <span class="n">l</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
-        <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;epoch </span><span class="si">%d</span><span class="s2">, loss: </span><span class="si">%f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">epoch</span><span class="p">,</span> <span class="n">l</span><span class="o">.</span><span class="n">item</span><span class="p">()))</span>
+<div class=" highlight hl-ipython3"><pre><span></span> 
 </pre></div>
 
     </div>
@@ -13205,50 +13234,18 @@ div#notebook {
     <div class="prompt"></div>
 
 
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>&lt;ipython-input-10-0dbba85240f7&gt;:47: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
-  y = torch.tensor(y, dtype=torch.float32)
-</pre>
-</div>
-</div>
+<div class="output_subarea output_text output_error">
+<pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">NameError</span>                                 Traceback (most recent call last)
+<span class="ansi-green-fg">&lt;ipython-input-1-f7614783591b&gt;</span> in <span class="ansi-cyan-fg">&lt;module&gt;</span>
+<span class="ansi-green-intense-fg ansi-bold">      4</span> <span class="ansi-red-fg">## Module 可以表示神经网络中的某一个层 也可以表示包含了很多层的神经网络</span>
+<span class="ansi-green-intense-fg ansi-bold">      5</span> <span class="ansi-red-fg">## 使用nn.module构建一个线性回归模型</span>
+<span class="ansi-green-fg">----&gt; 6</span><span class="ansi-red-fg"> </span><span class="ansi-green-fg">class</span> LinearNet<span class="ansi-blue-fg">(</span>nn<span class="ansi-blue-fg">.</span>Module<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">      7</span>     <span class="ansi-green-fg">def</span> __init__<span class="ansi-blue-fg">(</span>self<span class="ansi-blue-fg">,</span> n_feature<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">      8</span>         super<span class="ansi-blue-fg">(</span>LinearNet<span class="ansi-blue-fg">,</span> self<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">.</span>__init__<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span>
 
-<div class="output_area">
-
-    <div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>epoch 1, loss: 0.000151
-epoch 2, loss: 0.000128
-epoch 3, loss: 0.000160
-epoch 4, loss: 0.000091
-epoch 5, loss: 0.000172
-epoch 6, loss: 0.000141
-epoch 7, loss: 0.000085
-epoch 8, loss: 0.000108
-epoch 9, loss: 0.000129
-epoch 10, loss: 0.000129
-epoch 11, loss: 0.000043
-epoch 12, loss: 0.000087
-epoch 13, loss: 0.000225
-epoch 14, loss: 0.000115
-epoch 15, loss: 0.000205
-epoch 16, loss: 0.000104
-epoch 17, loss: 0.000120
-epoch 18, loss: 0.000068
-epoch 19, loss: 0.000075
-epoch 20, loss: 0.000065
-epoch 21, loss: 0.000143
-epoch 22, loss: 0.000125
-epoch 23, loss: 0.000042
-epoch 24, loss: 0.000155
-epoch 25, loss: 0.000062
-epoch 26, loss: 0.000071
-epoch 27, loss: 0.000077
-epoch 28, loss: 0.000102
-epoch 29, loss: 0.000096
-epoch 30, loss: 0.000062
-</pre>
+<span class="ansi-red-fg">NameError</span>: name &#39;nn&#39; is not defined</pre>
 </div>
 </div>
 
